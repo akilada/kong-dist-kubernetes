@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kong-tls
+  namespace: kong
+type: kubernetes.io/tls
+data:

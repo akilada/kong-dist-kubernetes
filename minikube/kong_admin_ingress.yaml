@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-secret: "kong/kong-tls"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  name: kong-admin-ingress
+  namespace: kong
+spec:
+  rules:
+  - host: kong-admin.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: kong-admin-ssl
+          servicePort: 8444
+        path: /
+  tls:
+  - hosts:
+    - kong-admin.cluster.local
+    secretName: kong-tls

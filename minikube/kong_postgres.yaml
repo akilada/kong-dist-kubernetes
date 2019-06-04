@@ -70,9 +70,18 @@ spec:
         name: kong
         app: kong
     spec:
+      volumes:
+      # - name: nginx-kong
+      #   configMap:
+      #     defaultMode: 511
+      #     name: nginx-kong
+      - name: kong-tls
+        secret:
+          secretName: kong-tls
+          defaultMode: 511
       containers:
       - name: kong
-        image: kong
+        image: kong:1.0.3-centos
         env:
           - name: KONG_ADMIN_LISTEN
             value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
@@ -88,6 +97,18 @@ spec:
             value: "/dev/stderr"
           - name: KONG_ADMIN_ERROR_LOG
             value: "/dev/stderr"
+          - name: KONG_SSL_CERT
+            value: "/tmp/ssl/tls.crt" 
+          - name: KONG_SSL_CERT_KEY
+            value: "/tmp/ssl/tls.key"
+          - name: KONG_ADMIN_SSL_CERT
+            value: "/tmp/ssl/tls.crt"
+          - name: KONG_ADMIN_SSL_CERT_KEY
+            value: "/tmp/ssl/tls.key"
+          - name: KONG_NGINX_ADMIN_SSL_CLIENT_CERTIFICATE
+            value: "/tmp/ssl/ca.crt"
+          - name: KONG_NGINX_ADMIN_SSL_VERIFY_CLIENT
+            value: "on"
         ports:
         - name: admin
           containerPort: 8001
@@ -101,3 +122,9 @@ spec:
         - name: admin-ssl
           containerPort: 8444
           protocol: TCP
+        volumeMounts:
+        - name: kong-tls
+          mountPath: /tmp/ssl
+        # - name: nginx-kong
+        #   mountPath: "/usr/local/kong/nginx-kong.conf"
+        #   subPath: nginx-kong.conf
